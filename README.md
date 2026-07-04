@@ -15,6 +15,7 @@ A hands-on data engineering course covering the core tools and concepts used in 
 | [Week 1](#week-1--data-engineering-and-basic-sql) | Data engineering and Basic SQL | | In progress |
 | [Week 2](#week-2--string-functions-normalization--group-by) | String Functions, Normalization, GROUP BY | [Cheatsheet](https://bishalrijal.github.io/Data-Engineering-Course/Week2/week2_string_functions_cheatsheet.html) · [Normalization](https://bishalrijal.github.io/Data-Engineering-Course/Week2/normalization_exercise.html) · [GROUP BY](https://bishalrijal.github.io/Data-Engineering-Course/Week2/group_by_under_the_hood.html) | In progress |
 | [Week 3](#week-3--python-for-data-pipelines) | Python for Data Pipelines | [Python Pre-read](https://bishalrijal.github.io/Data-Engineering-Course/Week3/week3_python_preread.html) | In progress |
+| Week 4 | Data Structures & Loops | [Data Structures Pre-read](https://bishalrijal.github.io/Data-Engineering-Course/Week4/week4_data_structures_preread.html) | In progress |
 
 ---
 

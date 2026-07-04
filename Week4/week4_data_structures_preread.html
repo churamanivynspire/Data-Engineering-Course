@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 4 Pre-read — Data Structures &amp; Loops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:      #0F1B2D;
+    --navy2:     #162236;
+    --navy3:     #1D2E47;
+    --teal:      #00C9A7;
+    --teal-dim:  #00956B;
+    --teal-bg:   rgba(0,201,167,0.08);
+    --teal-bd:   rgba(0,201,167,0.25);
+    --white:     #F0F4F8;
+    --white2:    #D8E2EE;
+    --slate:     #8899AA;
+    --slate2:    #607080;
+    --code-bg:   #111D2E;
+    --code-bd:   #243347;
+    --red:       #FF6B6B;
+    --red-bg:    rgba(255,107,107,0.08);
+    --red-bd:    rgba(255,107,107,0.25);
+    --amber:     #FFB347;
+    --amber-bg:  rgba(255,179,71,0.08);
+    --amber-bd:  rgba(255,179,71,0.25);
+    --green:     #4CAF82;
+    --green-bg:  rgba(76,175,130,0.08);
+    --green-bd:  rgba(76,175,130,0.25);
+    --sidebar-w: 240px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  code, pre, .mono, kbd {
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--navy2);
+    border-right: 1px solid var(--code-bd);
+    position: fixed;
+    top: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--code-bd);
+  }
+
+  .sidebar-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.4;
+  }
+
+  .sidebar-sub {
+    font-size: 11px;
+    color: var(--slate);
+    margin-top: 4px;
+  }
+
+  .sidebar-nav { padding: 12px 0; flex: 1; }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--slate2);
+    text-transform: uppercase;
+    padding: 10px 20px 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: var(--slate);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { color: var(--white); background: var(--navy3); }
+
+  .nav-item.active {
+    color: var(--teal);
+    border-left-color: var(--teal);
+    background: var(--teal-bg);
+    font-weight: 500;
+  }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--slate2);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .nav-item.active .nav-dot,
+  .nav-item.done .nav-dot { background: var(--teal); }
+  .nav-item.done { color: var(--slate); }
+
+  .progress-bar-wrap {
+    padding: 16px 20px;
+    border-top: 1px solid var(--code-bd);
+  }
+  .progress-label {
+    font-size: 11px;
+    color: var(--slate);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-track {
+    height: 3px;
+    background: var(--navy3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ── Main content ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: 800px;
+    padding: 48px 56px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── Section header ── */
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  h1.section-heading {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+
+  .section-intro {
+    font-size: 16px;
+    color: var(--white2);
+    line-height: 1.75;
+    margin-bottom: 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--code-bd);
+  }
+
+  /* ── Prose ── */
+  h2.subsection {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    margin: 32px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h2.subsection::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 18px;
+    background: var(--teal);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  p { color: var(--white2); margin-bottom: 14px; }
+
+  strong { color: var(--white); font-weight: 500; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout.tip  { background: var(--teal-bg); border: 1px solid var(--teal-bd); color: var(--white2); }
+  .callout.warn { background: var(--amber-bg); border: 1px solid var(--amber-bd); color: var(--white2); }
+  .callout.goal { background: var(--green-bg); border: 1px solid var(--green-bd); color: var(--white2); }
+  .callout.error{ background: var(--red-bg);   border: 1px solid var(--red-bd);   color: var(--white2); }
+  .callout strong { color: var(--white); }
+
+  /* ── Code block ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--code-bd);
+    border-radius: 10px;
+    margin: 18px 0;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--code-bd);
+    background: var(--navy2);
+  }
+
+  .code-lang {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--teal);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .code-label {
+    font-size: 11px;
+    color: var(--slate);
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--white);
+    padding: 18px 20px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* syntax highlight helpers */
+  .kw  { color: #FF79C6; }
+  .fn  { color: #50FA7B; }
+  .st  { color: #F1FA8C; }
+  .cm  { color: #6272A4; }
+  .nm  { color: #BD93F9; }
+  .op  { color: #FF79C6; }
+  .bi  { color: #8BE9FD; }
+
+  /* ── Before/After toggle ── */
+  .compare-wrap { margin: 24px 0; }
+
+  .compare-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--code-bd);
+    margin-bottom: 0;
+  }
+
+  .compare-tab {
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--slate);
+    transition: all 0.15s;
+    margin-bottom: -1px;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .compare-tab:hover { color: var(--white2); }
+  .compare-tab.active-before { color: var(--red); border-bottom-color: var(--red); }
+  .compare-tab.active-after  { color: var(--teal); border-bottom-color: var(--teal); }
+
+  .compare-panel { display: none; }
+  .compare-panel.visible { display: block; }
+
+  /* ── Key term pill ── */
+  .term {
+    display: inline-block;
+    background: var(--teal-bg);
+    border: 1px solid var(--teal-bd);
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 1px 8px;
+    border-radius: 4px;
+    margin: 0 1px;
+  }
+
+  /* ── Nav buttons ── */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--code-bd);
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--code-bd);
+    background: var(--navy2);
+    color: var(--white2);
+    text-decoration: none;
+  }
+
+  .nav-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .nav-btn:disabled { opacity: 0.3; pointer-events: none; }
+  .nav-btn.primary { background: var(--teal-bg); border-color: var(--teal); color: var(--teal); }
+
+  /* ── Check list ── */
+  .check-list { list-style: none; margin: 12px 0 20px; }
+  .check-list li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--white2);
+    border-bottom: 1px solid var(--code-bd);
+  }
+  .check-list li:last-child { border-bottom: none; }
+  .check-list li::before {
+    content: '→';
+    color: var(--teal);
+    flex-shrink: 0;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+
+  /* ── Concept card grid ── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .concept-card {
+    background: var(--navy2);
+    border: 1px solid var(--code-bd);
+    border-radius: 10px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .concept-card:hover {
+    border-color: var(--teal);
+    background: var(--navy3);
+  }
+
+  .concept-card-num {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .concept-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .concept-card-sub {
+    font-size: 12px;
+    color: var(--slate);
+    line-height: 1.5;
+  }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 13.5px; }
+  thead tr { border-bottom: 1px solid var(--teal-bd); }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--code-bd); color: var(--white2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td code, th code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--teal); }
+
+  /* ── inline code ── */
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--teal); background: var(--teal-bg); padding: 1px 6px; border-radius: 4px; }
+
+  /* ── Script banner ── */
+  .script-banner {
+    background: linear-gradient(135deg, var(--navy3) 0%, #0D2535 100%);
+    border: 1px solid var(--teal-bd);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 28px 0;
+  }
+  .script-banner-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .script-banner-sub {
+    font-size: 14px;
+    color: var(--slate);
+    margin-bottom: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-eyebrow">Week 4 · Pre-read</div>
+    <div class="sidebar-title">Data Structures &amp; Loops</div>
+    <div class="sidebar-sub">6 concepts · ~50 min</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Start here</div>
+    <a class="nav-item active" onclick="goTo(0)" href="#">
+      <span class="nav-dot"></span>Overview
+    </a>
+
+    <div class="nav-section-label">Concepts</div>
+    <a class="nav-item" onclick="goTo(1)" href="#">
+      <span class="nav-dot"></span>1 · Lists
+    </a>
+    <a class="nav-item" onclick="goTo(2)" href="#">
+      <span class="nav-dot"></span>2 · Tuples
+    </a>
+    <a class="nav-item" onclick="goTo(3)" href="#">
+      <span class="nav-dot"></span>3 · Sets
+    </a>
+    <a class="nav-item" onclick="goTo(4)" href="#">
+      <span class="nav-dot"></span>4 · Dictionaries
+    </a>
+    <a class="nav-item" onclick="goTo(5)" href="#">
+      <span class="nav-dot"></span>5 · Strings
+    </a>
+    <a class="nav-item" onclick="goTo(6)" href="#">
+      <span class="nav-dot"></span>6 · Looping patterns
+    </a>
+
+    <div class="nav-section-label">Reference</div>
+    <a class="nav-item" onclick="goTo(7)" href="#">
+      <span class="nav-dot"></span>Quick reference
+    </a>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-label">
+      <span>Progress</span>
+      <span id="progress-text">0 / 8</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Main ── -->
+<main class="main">
+
+  <!-- ── 0: Overview ── -->
+  <section class="section active" id="sec-0">
+    <div class="section-eyebrow">Before you start</div>
+    <h1 class="section-heading">Five data structures.<br>Every loop pattern you need.</h1>
+    <p class="section-intro">
+      Before you can read or write an ETL script, you need to recognise five structures on sight —
+      <strong>lists, tuples, sets, dictionaries, and strings</strong> — and know which built-in
+      methods apply to each. This pre-read covers all five with data engineering examples, then
+      collects every looping pattern you will actually use in class.
+    </p>
+
+    <div class="callout goal">
+      <span class="callout-icon">🎯</span>
+      <div><strong>By the end of this pre-read</strong> you will be able to look at any ETL transform
+      loop and immediately understand what it does — and write your own transforms from scratch
+      using the right structure for each job.</div>
+    </div>
+
+    <h2 class="subsection">What's covered</h2>
+    <div class="concept-grid">
+      <div class="concept-card" onclick="goTo(1)">
+        <div class="concept-card-num">01</div>
+        <div class="concept-card-title">Lists</div>
+        <div class="concept-card-sub">Ordered, mutable. Your go-to for collecting batches of rows.</div>
+      </div>
+      <div class="concept-card" onclick="goTo(2)">
+        <div class="concept-card-num">02</div>
+        <div class="concept-card-title">Tuples</div>
+        <div class="concept-card-sub">Ordered, immutable. What psycopg2 gives you for each DB row.</div>
+      </div>
+      <div class="concept-card" onclick="goTo(3)">
+        <div class="concept-card-num">03</div>
+        <div class="concept-card-title">Sets</div>
+        <div class="concept-card-sub">Unique values only. O(1) membership checks and deduplication.</div>
+      </div>
+      <div class="concept-card" onclick="goTo(4)">
+        <div class="concept-card-num">04</div>
+        <div class="concept-card-title">Dictionaries</div>
+        <div class="concept-card-sub">Key-value maps. The single most important structure in data work.</div>
+      </div>
+      <div class="concept-card" onclick="goTo(5)">
+        <div class="concept-card-num">05</div>
+        <div class="concept-card-title">Strings</div>
+        <div class="concept-card-sub">Clean, split, join, format. Handling every text column value.</div>
+      </div>
+      <div class="concept-card" onclick="goTo(6)">
+        <div class="concept-card-num">06</div>
+        <div class="concept-card-title">Looping patterns</div>
+        <div class="concept-card-sub">for, enumerate, zip, comprehensions, any/all — all in one place.</div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>How to use this pre-read:</strong> Each page has a <em>Before / After</em> toggle.
+      The Before tab shows a common mistake or naive approach with a real problem.
+      The After tab shows the correct pattern. Read both — understanding <em>why</em> the Before is wrong
+      is just as important as knowing the After.</div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" disabled>← Previous</button>
+      <button class="nav-btn primary" onclick="goTo(1)">Start: Lists →</button>
+    </div>
+  </section>
+
+
+  <!-- ── 1: Lists ── -->
+  <section class="section" id="sec-1">
+    <div class="section-eyebrow">Concept 1 of 6</div>
+    <h1 class="section-heading">Lists</h1>
+    <p class="section-intro">
+      A list is Python's most common sequence type. In data engineering, lists appear everywhere:
+      a batch of rows from <code>fetchall()</code>, a list of column names, a collection of IDs
+      to process. Lists are <strong>ordered, mutable, and allow duplicates</strong>.
+    </p>
+
+    <h2 class="subsection">Creating and reading</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">indexing, slicing, aggregates</span></div>
+      <pre><span class="cm"># Lists hold ordered, changeable collections</span>
+fares = [<span class="nm">450.0</span>, <span class="nm">320.5</span>, <span class="nm">210.0</span>, <span class="nm">580.0</span>, <span class="nm">275.0</span>]
+
+<span class="cm"># Access by index — zero-based</span>
+<span class="bi">print</span>(fares[<span class="nm">0</span>])     <span class="cm"># 450.0  — first element</span>
+<span class="bi">print</span>(fares[-<span class="nm">1</span>])    <span class="cm"># 275.0  — last element (negative counts from end)</span>
+<span class="bi">print</span>(fares[<span class="nm">1</span>:<span class="nm">3</span>])   <span class="cm"># [320.5, 210.0]  — slice: index 1 up to (not including) 3</span>
+<span class="bi">print</span>(fares[:<span class="nm">3</span>])    <span class="cm"># [450.0, 320.5, 210.0]  — first 3  (like SQL LIMIT 3)</span>
+<span class="bi">print</span>(fares[-<span class="nm">2</span>:])   <span class="cm"># [580.0, 275.0]         — last 2</span>
+
+<span class="cm"># Four aggregate functions you will use every single day</span>
+<span class="bi">print</span>(<span class="bi">len</span>(fares))    <span class="cm"># 5       — number of elements</span>
+<span class="bi">print</span>(<span class="bi">sum</span>(fares))    <span class="cm"># 1835.5  — total fare revenue</span>
+<span class="bi">print</span>(<span class="bi">min</span>(fares))    <span class="cm"># 210.0   — cheapest trip</span>
+<span class="bi">print</span>(<span class="bi">max</span>(fares))    <span class="cm"># 580.0   — most expensive trip</span></pre>
+    </div>
+
+    <h2 class="subsection">Adding and removing</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">append, insert, pop, remove</span></div>
+      <pre>fares = [<span class="nm">450.0</span>, <span class="nm">320.5</span>, <span class="nm">210.0</span>]
+
+fares.append(<span class="nm">580.0</span>)       <span class="cm"># add one item to END            → [..., 580.0]</span>
+fares.insert(<span class="nm">0</span>, <span class="nm">999.0</span>)    <span class="cm"># insert at specific index 0    → [999.0, 450.0, ...]</span>
+<span class="bi">print</span>(fares)               <span class="cm"># [999.0, 450.0, 320.5, 210.0, 580.0]</span>
+
+fares.pop()                <span class="cm"># remove &amp; return LAST element  → 580.0</span>
+fares.pop(<span class="nm">0</span>)              <span class="cm"># remove &amp; return at index 0    → 999.0</span>
+fares.remove(<span class="nm">210.0</span>)       <span class="cm"># remove FIRST occurrence of this value</span>
+<span class="bi">print</span>(fares)               <span class="cm"># [450.0, 320.5]</span></pre>
+    </div>
+
+    <h2 class="subsection">Searching</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">index, count, membership</span></div>
+      <pre>fares = [<span class="nm">450.0</span>, <span class="nm">320.5</span>, <span class="nm">210.0</span>, <span class="nm">320.5</span>]
+
+<span class="bi">print</span>(fares.index(<span class="nm">320.5</span>))   <span class="cm"># 1     — index of first occurrence</span>
+<span class="bi">print</span>(fares.count(<span class="nm">320.5</span>))   <span class="cm"># 2     — how many times this value appears</span>
+<span class="bi">print</span>(<span class="nm">320.5</span> <span class="kw">in</span> fares)       <span class="cm"># True  — membership check</span>
+<span class="bi">print</span>(<span class="nm">999.0</span> <span class="kw">in</span> fares)       <span class="cm"># False</span></pre>
+    </div>
+
+    <h2 class="subsection">Before / After — sort() vs sorted()</h2>
+    <div class="compare-wrap">
+      <div class="compare-tabs">
+        <button class="compare-tab active-before" onclick="toggle(this,'before','cmp-sort')">❌ Before — .sort() destroys the original</button>
+        <button class="compare-tab" onclick="toggle(this,'after','cmp-sort')">✓ After — sorted() returns a new copy</button>
+      </div>
+      <div id="cmp-sort-before" class="compare-panel visible">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--red)">problem: original order is gone</span></div>
+          <pre>fares = [<span class="nm">450.0</span>, <span class="nm">320.5</span>, <span class="nm">210.0</span>, <span class="nm">580.0</span>]
+
+fares.sort()      <span class="cm"># sorts IN-PLACE — original list is permanently changed</span>
+<span class="bi">print</span>(fares)      <span class="cm"># [210.0, 320.5, 450.0, 580.0]</span>
+
+<span class="cm"># Now you also need the original order for a log message:</span>
+<span class="cm"># print(f"Original order was: {fares}")  → too late, it's sorted now</span></pre>
+        </div>
+      </div>
+      <div id="cmp-sort-after" class="compare-panel">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--teal)">solution: sorted() returns a new list</span></div>
+          <pre>fares = [<span class="nm">450.0</span>, <span class="nm">320.5</span>, <span class="nm">210.0</span>, <span class="nm">580.0</span>]
+
+sorted_fares = <span class="bi">sorted</span>(fares)               <span class="cm"># new list, ascending</span>
+sorted_desc  = <span class="bi">sorted</span>(fares, reverse=<span class="kw">True</span>)  <span class="cm"># new list, descending</span>
+
+<span class="bi">print</span>(fares)          <span class="cm"># [450.0, 320.5, 210.0, 580.0]  ← unchanged</span>
+<span class="bi">print</span>(sorted_fares)   <span class="cm"># [210.0, 320.5, 450.0, 580.0]  ← new copy</span>
+
+<span class="cm"># Rule of thumb:</span>
+<span class="cm"># fares.sort()   → mutates in-place  (fast, no copy — use when you don't need original)</span>
+<span class="cm"># sorted(fares)  → returns new copy  (safe  — use when original still matters)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Method / Function</th><th>What it does</th><th>Returns</th></tr></thead>
+      <tbody>
+        <tr><td><code>len(lst)</code></td><td>Number of elements</td><td>int</td></tr>
+        <tr><td><code>sum(lst)</code></td><td>Sum of all elements</td><td>number</td></tr>
+        <tr><td><code>min(lst)</code> / <code>max(lst)</code></td><td>Smallest / largest element</td><td>element</td></tr>
+        <tr><td><code>lst.append(x)</code></td><td>Add x to end</td><td>None (mutates)</td></tr>
+        <tr><td><code>lst.insert(i, x)</code></td><td>Insert x at index i</td><td>None (mutates)</td></tr>
+        <tr><td><code>lst.pop()</code></td><td>Remove &amp; return last element</td><td>element</td></tr>
+        <tr><td><code>lst.pop(i)</code></td><td>Remove &amp; return element at index i</td><td>element</td></tr>
+        <tr><td><code>lst.remove(x)</code></td><td>Remove first occurrence of x</td><td>None (mutates)</td></tr>
+        <tr><td><code>lst.index(x)</code></td><td>Index of first occurrence of x</td><td>int</td></tr>
+        <tr><td><code>lst.count(x)</code></td><td>Times x appears</td><td>int</td></tr>
+        <tr><td><code>lst.sort()</code></td><td>Sort in-place</td><td>None (mutates)</td></tr>
+        <tr><td><code>sorted(lst)</code></td><td>Return new sorted copy</td><td>new list</td></tr>
+        <tr><td><code>lst.reverse()</code></td><td>Reverse in-place</td><td>None (mutates)</td></tr>
+        <tr><td><code>x in lst</code></td><td>Membership check</td><td>bool</td></tr>
+      </tbody>
+    </table>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goTo(0)">← Overview</button>
+      <button class="nav-btn primary" onclick="goTo(2)">Tuples →</button>
+    </div>
+  </section>
+
+
+  <!-- ── 2: Tuples ── -->
+  <section class="section" id="sec-2">
+    <div class="section-eyebrow">Concept 2 of 6</div>
+    <h1 class="section-heading">Tuples</h1>
+    <p class="section-intro">
+      A tuple is like a list but <strong>immutable</strong> — you cannot change it after creation.
+      The psycopg2 default cursor returns each database row as a tuple. Understanding tuples tells
+      you why you can't accidentally edit a row you just fetched, and how to unpack its values safely.
+    </p>
+
+    <h2 class="subsection">Basics</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">creating, accessing, immutability</span></div>
+      <pre><span class="cm"># Round brackets — type is 'tuple', not 'list'</span>
+pickup = (<span class="nm">27.7172</span>, <span class="nm">85.3240</span>)   <span class="cm"># (latitude, longitude)</span>
+<span class="bi">print</span>(<span class="bi">type</span>(pickup))             <span class="cm"># &lt;class 'tuple'&gt;</span>
+
+<span class="cm"># Access by index — identical to lists</span>
+<span class="bi">print</span>(pickup[<span class="nm">0</span>])   <span class="cm"># 27.7172</span>
+<span class="bi">print</span>(pickup[<span class="nm">1</span>])   <span class="cm"># 85.3240</span>
+
+<span class="cm"># len, count, index work the same as lists</span>
+<span class="bi">print</span>(<span class="bi">len</span>(pickup))             <span class="cm"># 2</span>
+<span class="bi">print</span>(pickup.count(<span class="nm">27.7172</span>))   <span class="cm"># 1</span>
+<span class="bi">print</span>(pickup.index(<span class="nm">85.3240</span>))   <span class="cm"># 1</span>
+
+<span class="cm"># Tuples are immutable — modifying them raises an error:</span>
+<span class="cm"># pickup[0] = 99   → TypeError: 'tuple' object does not support item assignment</span></pre>
+    </div>
+
+    <h2 class="subsection">Unpacking</h2>
+    <p>Unpacking assigns each element to a named variable in one line. This is the right way to work with tuple rows — you get readable names instead of mysterious index numbers.</p>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">tuple unpacking — the core pattern</span></div>
+      <pre><span class="cm"># Unpack into named variables</span>
+lat, lon = (<span class="nm">27.7172</span>, <span class="nm">85.3240</span>)
+<span class="bi">print</span>(<span class="nm">f</span><span class="st">"lat={lat}, lon={lon}"</span>)
+
+<span class="cm"># psycopg2 default cursor returns each row as a tuple</span>
+db_row = (<span class="nm">1</span>, <span class="st">"Sita Rai"</span>, <span class="st">"Kathmandu"</span>, <span class="nm">450.0</span>)
+trip_id, driver_name, city, fare = db_row
+<span class="bi">print</span>(<span class="nm">f</span><span class="st">"Trip {trip_id} by {driver_name} in {city}: NPR {fare}"</span>)
+
+<span class="cm"># Unpack inside a for loop — the most common ETL pattern</span>
+rows = [(<span class="nm">1</span>, <span class="st">"Alice"</span>, <span class="nm">450.0</span>), (<span class="nm">2</span>, <span class="st">"Bob"</span>, <span class="nm">320.5</span>)]
+<span class="kw">for</span> trip_id, driver, fare <span class="kw">in</span> rows:
+    <span class="bi">print</span>(<span class="nm">f</span><span class="st">"  {trip_id}: {driver} — NPR {fare}"</span>)</pre>
+    </div>
+
+    <h2 class="subsection">Tuples as dictionary keys</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">compound keys in lookup dicts</span></div>
+      <pre><span class="cm"># Lists CANNOT be dict keys — they're mutable, so their hash can change</span>
+<span class="cm"># Tuples CAN be dict keys — they're immutable, so their hash is stable</span>
+
+city_stats = {}
+city_stats[(<span class="st">"Kathmandu"</span>, <span class="st">"completed"</span>)] = <span class="nm">142</span>
+city_stats[(<span class="st">"Pokhara"</span>,   <span class="st">"completed"</span>)] = <span class="nm">88</span>
+
+<span class="bi">print</span>(city_stats[(<span class="st">"Kathmandu"</span>, <span class="st">"completed"</span>)])   <span class="cm"># 142</span>
+
+<span class="cm"># Useful for grouping by multiple columns at once —</span>
+<span class="cm"># the same idea as GROUP BY city, status in SQL</span></pre>
+    </div>
+
+    <h2 class="subsection">Before / After — index vs named unpacking</h2>
+    <div class="compare-wrap">
+      <div class="compare-tabs">
+        <button class="compare-tab active-before" onclick="toggle(this,'before','cmp-tup')">❌ Before — magic index numbers</button>
+        <button class="compare-tab" onclick="toggle(this,'after','cmp-tup')">✓ After — named unpacking</button>
+      </div>
+      <div id="cmp-tup-before" class="compare-panel visible">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--red)">problem: silent break if column order changes</span></div>
+          <pre><span class="cm"># SELECT trip_id, driver_id, fare_amount, status FROM trips</span>
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="kw">if</span> row[<span class="nm">3</span>] <span class="op">==</span> <span class="st">"completed"</span>:   <span class="cm"># what is index 3?</span>
+        total <span class="op">+=</span> row[<span class="nm">2</span>]          <span class="cm"># what is index 2?</span>
+
+<span class="cm"># If someone reorders the SELECT columns:</span>
+<span class="cm"># SELECT trip_id, STATUS, fare_amount, driver_id ...  ← status now at [1]</span>
+<span class="cm"># row[3] is now driver_id — wrong field, no error, wrong numbers silently</span></pre>
+        </div>
+      </div>
+      <div id="cmp-tup-after" class="compare-panel">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--teal)">solution: unpack once, use names everywhere</span></div>
+          <pre><span class="cm"># SELECT trip_id, driver_id, fare_amount, status FROM trips</span>
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    trip_id, driver_id, fare, status = row   <span class="cm"># unpack once at the top</span>
+
+    <span class="kw">if</span> status <span class="op">==</span> <span class="st">"completed"</span>:   <span class="cm"># clear intent</span>
+        total <span class="op">+=</span> fare           <span class="cm"># clear intent</span>
+
+<span class="cm"># If column order changes: you fix ONE unpacking line, not every access</span>
+<span class="cm"># Self-documenting: any reader can see what each field is</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th></th><th>List</th><th>Tuple</th></tr></thead>
+      <tbody>
+        <tr><td>Syntax</td><td><code>[...]</code></td><td><code>(...)</code></td></tr>
+        <tr><td>Mutable?</td><td>Yes</td><td>No — immutable</td></tr>
+        <tr><td>Can be dict key?</td><td>No</td><td>Yes</td></tr>
+        <tr><td><code>fetchall()</code> returns</td><td>One list (all rows)</td><td>One tuple per row</td></tr>
+        <tr><td>Use for</td><td>Collecting rows, building batches</td><td>Fixed records, compound dict keys</td></tr>
+      </tbody>
+    </table>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goTo(1)">← Lists</button>
+      <button class="nav-btn primary" onclick="goTo(3)">Sets →</button>
+    </div>
+  </section>
+
+
+  <!-- ── 3: Sets ── -->
+  <section class="section" id="sec-3">
+    <div class="section-eyebrow">Concept 3 of 6</div>
+    <h1 class="section-heading">Sets</h1>
+    <p class="section-intro">
+      A set holds <strong>unique values in no guaranteed order</strong>. Use sets for two things:
+      deduplication (removing duplicates from a list) and O(1) membership checks (testing whether
+      a value is in a large collection without looping through it).
+    </p>
+
+    <h2 class="subsection">Basics</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">creating, adding, removing</span></div>
+      <pre><span class="cm"># Curly braces with no key:value pairs (those would be a dict)</span>
+driver_ids = {<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">101</span>, <span class="nm">102</span>}   <span class="cm"># duplicates removed automatically</span>
+<span class="bi">print</span>(driver_ids)      <span class="cm"># {101, 102, 103}  — order is NOT guaranteed</span>
+<span class="bi">print</span>(<span class="bi">type</span>(driver_ids)) <span class="cm"># &lt;class 'set'&gt;</span>
+
+<span class="cm"># Adding</span>
+driver_ids.add(<span class="nm">104</span>)
+<span class="bi">print</span>(driver_ids)      <span class="cm"># {101, 102, 103, 104}</span>
+
+<span class="cm"># Removing</span>
+driver_ids.discard(<span class="nm">999</span>)   <span class="cm"># safe — no error if 999 is not in the set</span>
+driver_ids.remove(<span class="nm">104</span>)    <span class="cm"># raises KeyError if 104 is not found</span>
+<span class="bi">print</span>(driver_ids)          <span class="cm"># {101, 102, 103}</span></pre>
+    </div>
+
+    <h2 class="subsection">Membership check — O(1) speed</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">why set lookup matters at scale</span></div>
+      <pre>active_ids = {<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">104</span>, <span class="nm">105</span>}
+
+<span class="bi">print</span>(<span class="nm">101</span> <span class="kw">in</span> active_ids)   <span class="cm"># True  — same syntax as list, but O(1) speed</span>
+<span class="bi">print</span>(<span class="nm">999</span> <span class="kw">in</span> active_ids)   <span class="cm"># False</span>
+
+<span class="cm"># Why it matters in a 1,000,000-row ETL loop:</span>
+<span class="cm">#</span>
+<span class="cm">#   list  with 10,000 IDs → up to 10,000 comparisons per row check</span>
+<span class="cm">#   set   with 10,000 IDs → ~1 comparison regardless of set size</span>
+<span class="cm">#</span>
+<span class="cm"># At 1,000,000 rows: list = ~10 billion comparisons</span>
+<span class="cm">#                    set  = ~1 million comparisons</span></pre>
+    </div>
+
+    <h2 class="subsection">Set operations</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">union, intersection, difference</span></div>
+      <pre>active    = {<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>}
+completed = {<span class="nm">101</span>, <span class="nm">103</span>, <span class="nm">105</span>}
+
+<span class="bi">print</span>(active <span class="op">|</span> completed)   <span class="cm"># UNION:        {101, 102, 103, 105}  — in either</span>
+<span class="bi">print</span>(active <span class="op">&amp;</span> completed)   <span class="cm"># INTERSECTION: {101, 103}            — in both</span>
+<span class="bi">print</span>(active <span class="op">-</span> completed)   <span class="cm"># DIFFERENCE:   {102}    — active but no completed trip</span>
+<span class="bi">print</span>(active <span class="op">^</span> completed)   <span class="cm"># SYMMETRIC Δ:  {102, 105}  — in one but not both</span>
+
+<span class="cm"># Think of | as SQL UNION, &amp; as SQL INNER JOIN on IDs, - as LEFT ANTI JOIN</span></pre>
+    </div>
+
+    <h2 class="subsection">Before / After — deduplication</h2>
+    <div class="compare-wrap">
+      <div class="compare-tabs">
+        <button class="compare-tab active-before" onclick="toggle(this,'before','cmp-set')">❌ Before — manual O(n²) deduplication</button>
+        <button class="compare-tab" onclick="toggle(this,'after','cmp-set')">✓ After — one-liner with set</button>
+      </div>
+      <div id="cmp-set-before" class="compare-panel visible">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--red)">problem: slow and verbose</span></div>
+          <pre>raw_ids   = [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">101</span>, <span class="nm">103</span>, <span class="nm">102</span>, <span class="nm">104</span>]
+unique_ids = []
+<span class="kw">for</span> driver_id <span class="kw">in</span> raw_ids:
+    <span class="kw">if</span> driver_id <span class="kw">not in</span> unique_ids:   <span class="cm"># O(n) check for EACH item</span>
+        unique_ids.append(driver_id)
+
+<span class="cm"># At 100,000 rows: up to 10 billion comparisons</span></pre>
+        </div>
+      </div>
+      <div id="cmp-set-after" class="compare-panel">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--teal)">solution: set() removes duplicates in O(n)</span></div>
+          <pre>raw_ids    = [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">101</span>, <span class="nm">103</span>, <span class="nm">102</span>, <span class="nm">104</span>]
+unique_ids = <span class="bi">list</span>(<span class="bi">set</span>(raw_ids))   <span class="cm"># one pass — O(n)</span>
+<span class="bi">print</span>(unique_ids)   <span class="cm"># [101, 102, 103, 104]  (order may vary)</span>
+
+<span class="cm"># From a list of dicts — unique driver IDs from trip rows:</span>
+unique_drivers = <span class="bi">list</span>({t[<span class="st">"driver_id"</span>] <span class="kw">for</span> t <span class="kw">in</span> trips})   <span class="cm"># set comprehension</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Method / Operator</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>s.add(x)</code></td><td>Add x to the set</td></tr>
+        <tr><td><code>s.discard(x)</code></td><td>Remove x — no error if missing</td></tr>
+        <tr><td><code>s.remove(x)</code></td><td>Remove x — KeyError if missing</td></tr>
+        <tr><td><code>x in s</code></td><td>Membership check — O(1)</td></tr>
+        <tr><td><code>s1 | s2</code></td><td>Union — elements in either set</td></tr>
+        <tr><td><code>s1 &amp; s2</code></td><td>Intersection — elements in both</td></tr>
+        <tr><td><code>s1 - s2</code></td><td>Difference — in s1 but not s2</td></tr>
+        <tr><td><code>s1 ^ s2</code></td><td>Symmetric diff — in one but not both</td></tr>
+        <tr><td><code>list(set(x))</code></td><td>Deduplicate a list</td></tr>
+      </tbody>
+    </table>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goTo(2)">← Tuples</button>
+      <button class="nav-btn primary" onclick="goTo(4)">Dictionaries →</button>
+    </div>
+  </section>
+
+
+  <!-- ── 4: Dictionaries ── -->
+  <section class="section" id="sec-4">
+    <div class="section-eyebrow">Concept 4 of 6</div>
+    <h1 class="section-heading">Dictionaries</h1>
+    <p class="section-intro">
+      Dictionaries map keys to values. They are the single most important Python structure for
+      data engineering: a single DB row as a <code>dict</code>, a lookup table built before a
+      transform loop, the output of a <code>dict</code> comprehension. If you understand one
+      structure deeply, make it this one.
+    </p>
+
+    <h2 class="subsection">Creating and reading</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">access, safe get, default values</span></div>
+      <pre>trip = {
+    <span class="st">"trip_id"</span>:     <span class="nm">1</span>,
+    <span class="st">"driver_id"</span>:   <span class="nm">101</span>,
+    <span class="st">"fare_amount"</span>: <span class="nm">450.0</span>,
+    <span class="st">"status"</span>:      <span class="st">"completed"</span>,
+}
+
+<span class="cm"># Access by key</span>
+<span class="bi">print</span>(trip[<span class="st">"trip_id"</span>])       <span class="cm"># 1</span>
+<span class="bi">print</span>(trip[<span class="st">"fare_amount"</span>])   <span class="cm"># 450.0</span>
+
+<span class="cm"># trip["rating"]  → KeyError: 'rating'  — crashes if key doesn't exist</span>
+
+<span class="cm"># Safe access with .get()</span>
+<span class="bi">print</span>(trip.get(<span class="st">"rating"</span>))        <span class="cm"># None  — no crash</span>
+<span class="bi">print</span>(trip.get(<span class="st">"rating"</span>, <span class="nm">0</span>))     <span class="cm"># 0     — with a default value</span></pre>
+    </div>
+
+    <h2 class="subsection">Viewing keys, values, and pairs</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">keys(), values(), items()</span></div>
+      <pre>trip = {<span class="st">"trip_id"</span>: <span class="nm">1</span>, <span class="st">"driver_id"</span>: <span class="nm">101</span>, <span class="st">"fare_amount"</span>: <span class="nm">450.0</span>}
+
+<span class="bi">print</span>(<span class="bi">list</span>(trip.keys()))    <span class="cm"># ['trip_id', 'driver_id', 'fare_amount']</span>
+<span class="bi">print</span>(<span class="bi">list</span>(trip.values()))  <span class="cm"># [1, 101, 450.0]</span>
+<span class="bi">print</span>(<span class="bi">list</span>(trip.items()))   <span class="cm"># [('trip_id', 1), ('driver_id', 101), ...]</span>
+
+<span class="cm"># Loop over key-value pairs — the most useful pattern</span>
+<span class="kw">for</span> key, value <span class="kw">in</span> trip.items():
+    <span class="bi">print</span>(<span class="nm">f</span><span class="st">"  {key}: {value}"</span>)</pre>
+    </div>
+
+    <h2 class="subsection">Adding, updating, and removing</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">update, pop, merge</span></div>
+      <pre>trip = {<span class="st">"trip_id"</span>: <span class="nm">1</span>, <span class="st">"fare_amount"</span>: <span class="nm">450.0</span>}
+
+trip[<span class="st">"status"</span>]      = <span class="st">"completed"</span>          <span class="cm"># add a new key</span>
+trip[<span class="st">"fare_amount"</span>] = <span class="nm">500.0</span>               <span class="cm"># overwrite an existing key</span>
+
+trip.update({<span class="st">"tip"</span>: <span class="nm">50.0</span>, <span class="st">"rating"</span>: <span class="nm">4.8</span>}) <span class="cm"># merge another dict in</span>
+removed = trip.pop(<span class="st">"tip"</span>)                  <span class="cm"># remove and return the value</span>
+<span class="bi">print</span>(removed)   <span class="cm"># 50.0</span>
+
+<span class="cm"># Python 3.9+: merge operator — returns a new dict, originals unchanged</span>
+extras = {<span class="st">"city"</span>: <span class="st">"Kathmandu"</span>}
+merged = trip <span class="op">|</span> extras
+<span class="bi">print</span>(merged)</pre>
+    </div>
+
+    <h2 class="subsection">Dict comprehension — the lookup pattern</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">build a lookup dict in one line</span></div>
+      <pre>drivers = [
+    {<span class="st">"driver_id"</span>: <span class="nm">101</span>, <span class="st">"driver_key"</span>: <span class="nm">1</span>, <span class="st">"name"</span>: <span class="st">"Sita Rai"</span>},
+    {<span class="st">"driver_id"</span>: <span class="nm">102</span>, <span class="st">"driver_key"</span>: <span class="nm">2</span>, <span class="st">"name"</span>: <span class="st">"Ram Thapa"</span>},
+    {<span class="st">"driver_id"</span>: <span class="nm">103</span>, <span class="st">"driver_key"</span>: <span class="nm">3</span>, <span class="st">"name"</span>: <span class="st">"Gita Magar"</span>},
+]
+
+id_to_key  = {d[<span class="st">"driver_id"</span>]: d[<span class="st">"driver_key"</span>] <span class="kw">for</span> d <span class="kw">in</span> drivers}
+id_to_name = {d[<span class="st">"driver_id"</span>]: d[<span class="st">"name"</span>]       <span class="kw">for</span> d <span class="kw">in</span> drivers}
+
+<span class="bi">print</span>(id_to_key)    <span class="cm"># {101: 1, 102: 2, 103: 3}</span>
+<span class="bi">print</span>(id_to_name)   <span class="cm"># {101: 'Sita Rai', 102: 'Ram Thapa', 103: 'Gita Magar'}</span>
+
+<span class="cm"># Now resolve a driver_id in O(1) — no database call:</span>
+<span class="bi">print</span>(id_to_name.get(<span class="nm">101</span>, <span class="st">"Unknown"</span>))   <span class="cm"># "Sita Rai"</span></pre>
+    </div>
+
+    <h2 class="subsection">Before / After — N+1 queries vs dict lookup</h2>
+    <div class="compare-wrap">
+      <div class="compare-tabs">
+        <button class="compare-tab active-before" onclick="toggle(this,'before','cmp-dict')">❌ Before — one DB query per row</button>
+        <button class="compare-tab" onclick="toggle(this,'after','cmp-dict')">✓ After — build once, look up in memory</button>
+      </div>
+      <div id="cmp-dict-before" class="compare-panel visible">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--red)">problem: 5,000 DB round-trips</span></div>
+          <pre><span class="kw">for</span> trip <span class="kw">in</span> trips:   <span class="cm"># 5,000 rows</span>
+    cur.execute(
+        <span class="st">"SELECT name FROM drivers WHERE driver_id = %s"</span>,
+        (trip[<span class="st">"driver_id"</span>],)    <span class="cm"># ← one DB query per row</span>
+    )
+    trip[<span class="st">"driver_name"</span>] = cur.fetchone()[<span class="nm">0</span>]
+
+<span class="cm"># 5,000 trips = 5,000 separate database queries</span>
+<span class="cm"># At 1 ms per query: 5 seconds minimum</span>
+<span class="cm"># At 1,000,000 trips: 16+ minutes just for lookups</span></pre>
+        </div>
+      </div>
+      <div id="cmp-dict-after" class="compare-panel">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--teal)">solution: 1 query, then O(1) lookups</span></div>
+          <pre><span class="cm"># One query — fetch ALL drivers at once</span>
+cur.execute(<span class="st">"SELECT driver_id, name FROM drivers"</span>)
+driver_lookup = {row[<span class="nm">0</span>]: row[<span class="nm">1</span>] <span class="kw">for</span> row <span class="kw">in</span> cur.fetchall()}
+
+<span class="cm"># Now loop — no DB calls at all</span>
+<span class="kw">for</span> trip <span class="kw">in</span> trips:
+    trip[<span class="st">"driver_name"</span>] = driver_lookup.get(trip[<span class="st">"driver_id"</span>], <span class="st">"Unknown"</span>)
+
+<span class="cm"># 1 DB query total instead of 5,000</span>
+<span class="cm"># In-memory dict lookup: O(1) per row</span>
+<span class="cm"># This one pattern is worth the entire session.</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Method / Operator</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>d[key]</code></td><td>Get value — KeyError if key missing</td></tr>
+        <tr><td><code>d.get(key)</code></td><td>Get value — None if key missing</td></tr>
+        <tr><td><code>d.get(key, default)</code></td><td>Get value — default if key missing</td></tr>
+        <tr><td><code>d.keys()</code></td><td>View of all keys</td></tr>
+        <tr><td><code>d.values()</code></td><td>View of all values</td></tr>
+        <tr><td><code>d.items()</code></td><td>View of (key, value) pairs — use in for loops</td></tr>
+        <tr><td><code>d.update(other)</code></td><td>Merge another dict in (mutates d)</td></tr>
+        <tr><td><code>d.pop(key)</code></td><td>Remove key and return its value</td></tr>
+        <tr><td><code>d | other</code></td><td>Merge, return new dict (Python 3.9+)</td></tr>
+        <tr><td><code>{k: v for ...}</code></td><td>Dict comprehension — build from a sequence</td></tr>
+      </tbody>
+    </table>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goTo(3)">← Sets</button>
+      <button class="nav-btn primary" onclick="goTo(5)">Strings →</button>
+    </div>
+  </section>
+
+
+  <!-- ── 5: Strings ── -->
+  <section class="section" id="sec-5">
+    <div class="section-eyebrow">Concept 5 of 6</div>
+    <h1 class="section-heading">Strings</h1>
+    <p class="section-intro">
+      Every value from a database column, CSV file, or API response is — at some point — a string.
+      Knowing how to <strong>clean, search, split, join, and format</strong> strings is a core ETL skill.
+      It also includes the one rule you must never break: never put a string directly inside SQL.
+    </p>
+
+    <h2 class="subsection">Cleaning</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">strip, case conversion</span></div>
+      <pre>raw = <span class="st">"  Kathmandu  "</span>
+
+<span class="bi">print</span>(raw.strip())    <span class="cm"># "Kathmandu"    — remove both sides</span>
+<span class="bi">print</span>(raw.lstrip())   <span class="cm"># "Kathmandu  "  — left side only</span>
+<span class="bi">print</span>(raw.rstrip())   <span class="cm"># "  Kathmandu"  — right side only</span>
+
+city = raw.strip()    <span class="cm"># clean first, then transform</span>
+<span class="bi">print</span>(city.upper())   <span class="cm"># "KATHMANDU"</span>
+<span class="bi">print</span>(city.lower())   <span class="cm"># "kathmandu"</span>
+<span class="bi">print</span>(city.title())   <span class="cm"># "Kathmandu"  — first letter of each word capitalised</span>
+
+<span class="cm"># In ETL: strip().lower() normalises values before comparison</span>
+cities = [<span class="st">"Kathmandu"</span>, <span class="st">"kathmandu"</span>, <span class="st">"  KATHMANDU  "</span>]
+normalised = [c.strip().lower() <span class="kw">for</span> c <span class="kw">in</span> cities]
+<span class="bi">print</span>(normalised)   <span class="cm"># ['kathmandu', 'kathmandu', 'kathmandu']</span></pre>
+    </div>
+
+    <h2 class="subsection">Checking content</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">startswith, endswith, find, replace</span></div>
+      <pre>status = <span class="st">"trip_completed_ok"</span>
+city   = <span class="st">"Kathmandu"</span>
+
+<span class="bi">print</span>(city.startswith(<span class="st">"Kath"</span>))    <span class="cm"># True</span>
+<span class="bi">print</span>(city.endswith(<span class="st">"andu"</span>))     <span class="cm"># True</span>
+<span class="bi">print</span>(<span class="st">"ath"</span> <span class="kw">in</span> city)            <span class="cm"># True  — substring membership</span>
+<span class="bi">print</span>(city.isdigit())            <span class="cm"># False</span>
+<span class="bi">print</span>(<span class="st">"12345"</span>.isdigit())         <span class="cm"># True</span>
+
+<span class="bi">print</span>(status.find(<span class="st">"completed"</span>))  <span class="cm"># 5   — index of first match; -1 if not found</span>
+<span class="bi">print</span>(status.replace(<span class="st">"_"</span>, <span class="st">" "</span>))  <span class="cm"># "trip completed ok"</span></pre>
+    </div>
+
+    <h2 class="subsection">Splitting and joining</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">parse CSV lines, build SQL placeholders</span></div>
+      <pre><span class="cm"># Parsing a CSV line</span>
+csv_line = <span class="st">"1,Sita Rai,Kathmandu,450.0,completed"</span>
+parts    = csv_line.split(<span class="st">","</span>)
+<span class="bi">print</span>(parts)
+<span class="cm"># ['1', 'Sita Rai', 'Kathmandu', '450.0', 'completed']</span>
+
+<span class="cm"># zip() headers with values to get a dict</span>
+headers  = [<span class="st">"trip_id"</span>, <span class="st">"driver_name"</span>, <span class="st">"city"</span>, <span class="st">"fare_amount"</span>, <span class="st">"status"</span>]
+row_dict = <span class="bi">dict</span>(<span class="bi">zip</span>(headers, parts))
+<span class="bi">print</span>(row_dict)
+<span class="cm"># {'trip_id': '1', 'driver_name': 'Sita Rai', 'city': 'Kathmandu', ...}</span>
+
+<span class="cm"># join() to build SQL INSERT placeholders</span>
+placeholders = <span class="st">", "</span>.join([<span class="st">"%s"</span>] <span class="op">*</span> <span class="bi">len</span>(headers))
+<span class="bi">print</span>(placeholders)   <span class="cm"># %s, %s, %s, %s, %s</span></pre>
+    </div>
+
+    <h2 class="subsection">f-string formatting</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">number formatting, alignment</span></div>
+      <pre>fare   = <span class="nm">1000450.75</span>
+count  = <span class="nm">1500000</span>
+driver = <span class="st">"Sita Rai"</span>
+
+<span class="bi">print</span>(<span class="nm">f</span><span class="st">"Fare: {fare:.2f}"</span>)         <span class="cm"># "Fare: 1000450.75"   — 2 decimal places</span>
+<span class="bi">print</span>(<span class="nm">f</span><span class="st">"Fare: {fare:,.2f}"</span>)        <span class="cm"># "Fare: 1,000,450.75" — with comma separators</span>
+<span class="bi">print</span>(<span class="nm">f</span><span class="st">"Rows: {count:,}"</span>)          <span class="cm"># "Rows: 1,500,000"    — whole number with commas</span>
+
+<span class="cm"># Column alignment — useful in log messages and text reports</span>
+<span class="bi">print</span>(<span class="nm">f</span><span class="st">"{'Driver':<span class="nm">&lt;15</span>}{'Fare':&gt;12}"</span>)         <span class="cm"># headers</span>
+<span class="bi">print</span>(<span class="nm">f</span><span class="st">"{driver:<span class="nm">&lt;15</span>}{fare:&gt;12,.2f}"</span>)           <span class="cm"># data row</span>
+<span class="cm"># Driver             1,000,450.75</span></pre>
+    </div>
+
+    <h2 class="subsection">Before / After — SQL injection</h2>
+    <div class="compare-wrap">
+      <div class="compare-tabs">
+        <button class="compare-tab active-before" onclick="toggle(this,'before','cmp-str')">❌ Before — f-string in SQL</button>
+        <button class="compare-tab" onclick="toggle(this,'after','cmp-str')">✓ After — parameterized query</button>
+      </div>
+      <div id="cmp-str-before" class="compare-panel visible">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--red)">problem: SQL injection vulnerability</span></div>
+          <pre>status = <span class="st">"completed"</span>
+
+<span class="cm"># NEVER do this</span>
+cur.execute(<span class="nm">f</span><span class="st">"SELECT * FROM trips WHERE status = '{status}'"</span>)
+
+<span class="cm"># What if status was:   completed' OR '1'='1</span>
+<span class="cm"># The query becomes:    WHERE status = 'completed' OR '1'='1'</span>
+<span class="cm"># Which returns EVERY row regardless of status — a data breach</span></pre>
+        </div>
+      </div>
+      <div id="cmp-str-after" class="compare-panel">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--teal)">solution: parameterized query — always</span></div>
+          <pre>status = <span class="st">"completed"</span>
+
+cur.execute(
+    <span class="st">"SELECT * FROM trips WHERE status = %s"</span>,
+    (status,)   <span class="cm"># ← tuple — note the trailing comma for single-element tuples</span>
+)
+
+<span class="cm"># psycopg2 safely escapes the value regardless of what it contains</span>
+<span class="cm"># This is the ONLY safe way to include a variable value in SQL</span>
+<span class="cm"># No exceptions — even if the value comes from your own code</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Method</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>s.strip()</code></td><td>Remove leading/trailing whitespace</td></tr>
+        <tr><td><code>s.upper()</code> / <code>s.lower()</code> / <code>s.title()</code></td><td>Case conversion</td></tr>
+        <tr><td><code>s.startswith(x)</code> / <code>s.endswith(x)</code></td><td>Check prefix or suffix</td></tr>
+        <tr><td><code>x in s</code></td><td>Substring membership check</td></tr>
+        <tr><td><code>s.find(x)</code></td><td>Index of first match; -1 if not found</td></tr>
+        <tr><td><code>s.replace(old, new)</code></td><td>Replace all occurrences</td></tr>
+        <tr><td><code>s.split(delim)</code></td><td>Split string into a list on delimiter</td></tr>
+        <tr><td><code>delim.join(lst)</code></td><td>Join a list of strings with delimiter</td></tr>
+        <tr><td><code>s.isdigit()</code> / <code>s.isalpha()</code></td><td>Check character type</td></tr>
+        <tr><td><code>f"{v:.2f}"</code></td><td>Format float to 2 decimal places</td></tr>
+        <tr><td><code>f"{v:,}"</code></td><td>Format number with comma separators</td></tr>
+      </tbody>
+    </table>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goTo(4)">← Dictionaries</button>
+      <button class="nav-btn primary" onclick="goTo(6)">Looping patterns →</button>
+    </div>
+  </section>
+
+
+  <!-- ── 6: Looping patterns ── -->
+  <section class="section" id="sec-6">
+    <div class="section-eyebrow">Concept 6 of 6</div>
+    <h1 class="section-heading">Looping patterns</h1>
+    <p class="section-intro">
+      Python gives you many ways to iterate over data. Each pattern suits a different scenario.
+      Knowing which one to reach for makes the difference between clear, readable ETL code
+      and code that works but no-one wants to touch.
+    </p>
+
+    <h2 class="subsection">for and enumerate</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">basic for loop and row-number tracking</span></div>
+      <pre>fares = [<span class="nm">450.0</span>, <span class="nm">320.5</span>, <span class="nm">210.0</span>, <span class="nm">580.0</span>]
+
+<span class="cm"># Basic for — when you just need the values</span>
+<span class="kw">for</span> fare <span class="kw">in</span> fares:
+    <span class="bi">print</span>(fare)
+
+<span class="cm"># enumerate — when you also need the position (start=1 for human-readable row numbers)</span>
+<span class="kw">for</span> i, fare <span class="kw">in</span> <span class="bi">enumerate</span>(fares, start=<span class="nm">1</span>):
+    <span class="bi">print</span>(<span class="nm">f</span><span class="st">"  [{i}] {fare}"</span>)
+
+<span class="cm"># enumerate over a list of dicts — the core ETL loop</span>
+trips = [
+    {<span class="st">"trip_id"</span>: <span class="nm">1</span>, <span class="st">"fare_amount"</span>: <span class="nm">450.0</span>, <span class="st">"status"</span>: <span class="st">"completed"</span>},
+    {<span class="st">"trip_id"</span>: <span class="nm">2</span>, <span class="st">"fare_amount"</span>: <span class="nm">320.5</span>, <span class="st">"status"</span>: <span class="st">"cancelled"</span>},
+]
+<span class="kw">for</span> row_num, trip <span class="kw">in</span> <span class="bi">enumerate</span>(trips, start=<span class="nm">1</span>):
+    <span class="kw">if</span> trip[<span class="st">"status"</span>] <span class="op">!=</span> <span class="st">"completed"</span>:
+        <span class="kw">continue</span>   <span class="cm"># skip to next row</span>
+    <span class="bi">print</span>(<span class="nm">f</span><span class="st">"Row {row_num}: trip {trip['trip_id']} = {trip['fare_amount']}"</span>)</pre>
+    </div>
+
+    <h2 class="subsection">while and zip</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">batch processing and parallel iteration</span></div>
+      <pre><span class="cm"># while — consuming a queue or processing rows in batches</span>
+rows       = <span class="bi">list</span>(<span class="bi">range</span>(<span class="nm">100</span>))
+batch_size = <span class="nm">20</span>
+
+<span class="kw">while</span> rows:
+    batch = rows[:batch_size]
+    rows  = rows[batch_size:]
+    <span class="bi">print</span>(<span class="nm">f</span><span class="st">"  Processing {len(batch)} rows, {len(rows)} remaining"</span>)
+
+<span class="cm"># zip — walk two lists in parallel (headers + values from a cursor row)</span>
+headers = [<span class="st">"trip_id"</span>, <span class="st">"fare_amount"</span>, <span class="st">"status"</span>]
+values  = [<span class="nm">1</span>, <span class="nm">450.0</span>, <span class="st">"completed"</span>]
+
+<span class="kw">for</span> key, val <span class="kw">in</span> <span class="bi">zip</span>(headers, values):
+    <span class="bi">print</span>(<span class="nm">f</span><span class="st">"  {key}: {val}"</span>)
+
+<span class="cm"># One-liner to build a row dict from headers + values:</span>
+row_dict = <span class="bi">dict</span>(<span class="bi">zip</span>(headers, values))   <span class="cm"># {'trip_id': 1, 'fare_amount': 450.0, ...}</span></pre>
+    </div>
+
+    <h2 class="subsection">Comprehensions</h2>
+    <div class="code-wrap">
+      <div class="code-header"><span class="code-lang">python</span><span class="code-label">list, dict, set comprehensions — and any/all</span></div>
+      <pre>trips = [
+    {<span class="st">"trip_id"</span>: <span class="nm">1</span>, <span class="st">"fare_amount"</span>: <span class="nm">450.0</span>, <span class="st">"status"</span>: <span class="st">"completed"</span>},
+    {<span class="st">"trip_id"</span>: <span class="nm">2</span>, <span class="st">"fare_amount"</span>: <span class="nm">320.5</span>, <span class="st">"status"</span>: <span class="st">"cancelled"</span>},
+    {<span class="st">"trip_id"</span>: <span class="nm">3</span>, <span class="st">"fare_amount"</span>: <span class="nm">580.0</span>, <span class="st">"status"</span>: <span class="st">"completed"</span>},
+]
+
+<span class="cm"># List comprehension — filter + transform in one line</span>
+completed_fares = [t[<span class="st">"fare_amount"</span>] <span class="kw">for</span> t <span class="kw">in</span> trips <span class="kw">if</span> t[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"completed"</span>]
+<span class="bi">print</span>(completed_fares)   <span class="cm"># [450.0, 580.0]</span>
+
+<span class="cm"># Dict comprehension — build a lookup in one line</span>
+id_to_fare = {t[<span class="st">"trip_id"</span>]: t[<span class="st">"fare_amount"</span>] <span class="kw">for</span> t <span class="kw">in</span> trips}
+<span class="bi">print</span>(id_to_fare)        <span class="cm"># {1: 450.0, 2: 320.5, 3: 580.0}</span>
+
+<span class="cm"># Set comprehension — unique values from a column</span>
+statuses = {t[<span class="st">"status"</span>] <span class="kw">for</span> t <span class="kw">in</span> trips}
+<span class="bi">print</span>(statuses)          <span class="cm"># {'completed', 'cancelled'}</span>
+
+<span class="cm"># any() / all() — aggregate boolean checks</span>
+<span class="bi">print</span>(<span class="bi">any</span>(t[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"cancelled"</span> <span class="kw">for</span> t <span class="kw">in</span> trips))   <span class="cm"># True</span>
+<span class="bi">print</span>(<span class="bi">all</span>(t[<span class="st">"fare_amount"</span>] <span class="op">&gt;</span> <span class="nm">100</span>       <span class="kw">for</span> t <span class="kw">in</span> trips))   <span class="cm"># True</span></pre>
+    </div>
+
+    <h2 class="subsection">Before / After — for + append vs comprehension</h2>
+    <div class="compare-wrap">
+      <div class="compare-tabs">
+        <button class="compare-tab active-before" onclick="toggle(this,'before','cmp-loop')">❌ Before — verbose accumulator loop</button>
+        <button class="compare-tab" onclick="toggle(this,'after','cmp-loop')">✓ After — list comprehension</button>
+      </div>
+      <div id="cmp-loop-before" class="compare-panel visible">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--red)">5 lines to do one thing</span></div>
+          <pre>completed_fares = []
+<span class="kw">for</span> trip <span class="kw">in</span> trips:
+    <span class="kw">if</span> trip[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"completed"</span>:
+        completed_fares.append(trip[<span class="st">"fare_amount"</span>])
+<span class="bi">print</span>(completed_fares)</pre>
+        </div>
+      </div>
+      <div id="cmp-loop-after" class="compare-panel">
+        <div class="code-wrap" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;">
+          <div class="code-header"><span class="code-lang">python</span><span class="code-label" style="color:var(--teal)">1 line — same result</span></div>
+          <pre>completed_fares = [t[<span class="st">"fare_amount"</span>] <span class="kw">for</span> t <span class="kw">in</span> trips <span class="kw">if</span> t[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"completed"</span>]
+<span class="bi">print</span>(completed_fares)
+
+<span class="cm"># When NOT to use a comprehension:</span>
+<span class="cm"># - Body has side effects: logging, DB writes, print statements</span>
+<span class="cm"># - More than one condition that needs a comment to explain</span>
+<span class="cm"># - Result would be longer than ~80 characters</span>
+<span class="cm"># For those cases, use an explicit for loop instead</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>continue vs break:</strong> <code>continue</code> skips to the next iteration — use it to skip bad rows. <code>break</code> exits the loop entirely — use it when you've found what you need or hit a fatal condition. In ETL loops, <code>continue</code> is far more common.</div>
+    </div>
+
+    <table>
+      <thead><tr><th>Pattern</th><th>Use when</th></tr></thead>
+      <tbody>
+        <tr><td><code>for x in lst</code></td><td>Processing every item; index not needed</td></tr>
+        <tr><td><code>for i, x in enumerate(lst, start=1)</code></td><td>Need row number for error logging or reports</td></tr>
+        <tr><td><code>while lst:</code></td><td>Consuming a queue or processing in batches</td></tr>
+        <tr><td><code>for a, b in zip(lst1, lst2)</code></td><td>Walking two lists in parallel</td></tr>
+        <tr><td><code>[expr for x in lst if cond]</code></td><td>Filter + transform; result needed as a list</td></tr>
+        <tr><td><code>{k: v for ...}</code></td><td>Build a dict from a sequence</td></tr>
+        <tr><td><code>{expr for x in lst}</code></td><td>Unique values from a column</td></tr>
+        <tr><td><code>any(cond for x in lst)</code></td><td>Check if at least one item matches</td></tr>
+        <tr><td><code>all(cond for x in lst)</code></td><td>Check if every item matches</td></tr>
+      </tbody>
+    </table>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goTo(5)">← Strings</button>
+      <button class="nav-btn primary" onclick="goTo(7)">Quick reference →</button>
+    </div>
+  </section>
+
+
+  <!-- ── 7: Quick Reference ── -->
+  <section class="section" id="sec-7">
+    <div class="section-eyebrow">Reference</div>
+    <h1 class="section-heading">Quick reference</h1>
+    <p class="section-intro">
+      Everything from this pre-read on one page. Use it during class when you need to
+      remember a method name or decide which structure to use.
+    </p>
+
+    <h2 class="subsection">Which structure should I use?</h2>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>List</th>
+          <th>Tuple</th>
+          <th>Set</th>
+          <th>Dict</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Syntax</td>
+          <td><code>[...]</code></td>
+          <td><code>(...)</code></td>
+          <td><code>{...}</code></td>
+          <td><code>{k: v}</code></td>
+        </tr>
+        <tr>
+          <td>Mutable?</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>Yes</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>Ordered?</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>Yes (3.7+)</td>
+        </tr>
+        <tr>
+          <td>Duplicates?</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>Keys: No</td>
+        </tr>
+        <tr>
+          <td>Best for</td>
+          <td>Collecting rows</td>
+          <td>One DB row</td>
+          <td>Dedup / fast <code>in</code></td>
+          <td>Lookups / records</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="subsection">All methods at a glance</h2>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>Lists:</strong>
+        <code>len</code> · <code>sum</code> · <code>min</code> · <code>max</code> ·
+        <code>append</code> · <code>insert</code> · <code>pop</code> · <code>remove</code> ·
+        <code>index</code> · <code>count</code> · <code>sort</code> · <code>sorted()</code> ·
+        <code>reverse</code> · <code>x in lst</code> · slicing <code>[i:j]</code>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>Tuples:</strong>
+        <code>len</code> · <code>count</code> · <code>index</code> ·
+        unpacking <code>a, b = tup</code> · use as dict keys · loop unpack <code>for a, b in lst</code>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>Sets:</strong>
+        <code>add</code> · <code>discard</code> · <code>remove</code> ·
+        <code>x in s</code> (O(1)) ·
+        <code>|</code> union · <code>&amp;</code> intersection · <code>-</code> difference ·
+        <code>list(set(x))</code> dedup
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>Dicts:</strong>
+        <code>d[k]</code> · <code>d.get(k, default)</code> ·
+        <code>keys()</code> · <code>values()</code> · <code>items()</code> ·
+        <code>update()</code> · <code>pop()</code> · <code>d | other</code> ·
+        <code>{k: v for ...}</code>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>Strings:</strong>
+        <code>strip</code> · <code>upper/lower/title</code> ·
+        <code>startswith/endswith</code> · <code>x in s</code> ·
+        <code>find</code> · <code>replace</code> · <code>split</code> · <code>join</code> ·
+        <code>isdigit/isalpha</code> · <code>f"{v:,.2f}"</code>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>Loops:</strong>
+        <code>for x in lst</code> · <code>enumerate(lst, start=1)</code> ·
+        <code>while lst:</code> · <code>zip(a, b)</code> ·
+        <code>[expr for x in lst if cond]</code> ·
+        <code>{k: v for ...}</code> · <code>{expr for ...}</code> ·
+        <code>any()</code> · <code>all()</code>
+      </div>
+    </div>
+
+    <h2 class="subsection">The three patterns that appear in every ETL script</h2>
+    <ul class="check-list">
+      <li><strong>Build a lookup dict once, look up in O(1).</strong> Never query the database inside a loop. Fetch all dimension rows once, build <code>{id: key}</code>, then resolve with <code>.get()</code>.</li>
+      <li><strong>Unpack tuples by name, not by index.</strong> <code>trip_id, driver_id, fare, status = row</code> at the top of the loop. If the column order ever changes, you fix one line.</li>
+      <li><strong>Use list comprehensions for pure filter + transform.</strong> For anything with logging, DB writes, or complex conditions, keep an explicit <code>for</code> loop — it's easier to read and easier to add error handling to.</li>
+    </ul>
+
+    <div class="callout goal">
+      <span class="callout-icon">🎯</span>
+      <div><strong>You're ready for class</strong> when you can explain what each structure is used for without looking at this page, and you can write a list comprehension, a dict comprehension, and an <code>enumerate</code> loop from memory. Everything else you can look up.</div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goTo(6)">← Looping patterns</button>
+      <button class="nav-btn" style="opacity:0.3;pointer-events:none;">End of pre-read</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const TOTAL = 8;
+  let visited = new Set([0]);
+
+  function goTo(idx) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach((n, i) => {
+      n.classList.remove('active');
+      if (visited.has(i) && i !== idx) n.classList.add('done');
+      else n.classList.remove('done');
+    });
+
+    const sec = document.getElementById('sec-' + idx);
+    if (sec) sec.classList.add('active');
+
+    const navItems = document.querySelectorAll('.nav-item');
+    if (navItems[idx]) navItems[idx].classList.add('active');
+
+    visited.add(idx);
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress() {
+    const pct = Math.round((visited.size / TOTAL) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = visited.size + ' / ' + TOTAL;
+  }
+
+  function toggle(btn, side, id) {
+    const wrap = btn.closest('.compare-wrap');
+    wrap.querySelectorAll('.compare-panel').forEach(p => p.classList.remove('visible'));
+    wrap.querySelectorAll('.compare-tab').forEach(t => {
+      t.classList.remove('active-before', 'active-after');
+    });
+    document.getElementById(id + '-' + side).classList.add('visible');
+    btn.classList.add('active-' + side);
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
