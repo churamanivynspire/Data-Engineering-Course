@@ -75,6 +75,19 @@ CREATE TABLE dim_promo_code (
 );
 
 
+CREATE TABLE dim_vehicle (
+    vehicle_key     SERIAL       PRIMARY KEY,
+    vehicle_id      INTEGER      NOT NULL UNIQUE,   -- natural key from OLTP
+    plate_number    VARCHAR(20),
+    make            VARCHAR(50),
+    model           VARCHAR(50),
+    year            SMALLINT,
+    color           VARCHAR(30),
+    category        VARCHAR(20),                    -- economy / comfort / xl / luxury
+    is_active       BOOLEAN
+);
+
+
 CREATE TABLE fact_trips (
     trip_key                SERIAL          PRIMARY KEY,
     source_trip_id          INTEGER         NOT NULL UNIQUE,   -- OLTP trips.trip_id — for lineage + ON CONFLICT
@@ -87,7 +100,9 @@ CREATE TABLE fact_trips (
     dropoff_location_key    INTEGER         NOT NULL REFERENCES dim_location(location_key),
     payment_method_key      INTEGER         REFERENCES dim_payment_method(payment_method_key),
     promo_code_key          INTEGER         REFERENCES dim_promo_code(promo_code_key),
- 
+    vehicle_key             INTEGER         REFERENCES dim_vehicle(vehicle_key),    -- nullable: trips.vehicle_id is nullable in OLTP
+    time_key                INTEGER         NOT NULL REFERENCES dim_time(time_key), -- always known: derived from requested_at
+
     -- ── Additive measures ───────────────────────────────────────────────────
     base_fare               NUMERIC(10,2),
     tip_amount              NUMERIC(8,2)    NOT NULL DEFAULT 0.00,

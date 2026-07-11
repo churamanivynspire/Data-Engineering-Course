@@ -110,6 +110,24 @@ LOAD_DIM_PAYMENT_METHOD = """
     RETURNING payment_method_id, payment_method_key
 """
 
+EXTRACT_VEHICLES = "SELECT vehicle_id, plate_number, make, model, year, color, category, is_active FROM vehicles"
+
+LOAD_DIM_VEHICLE = """
+    INSERT INTO dim_vehicle (
+        vehicle_id,
+        plate_number,
+        make,
+        model,
+        year,
+        color,
+        category,
+        is_active
+    )
+    VALUES %s
+    ON CONFLICT (vehicle_id) DO NOTHING
+    RETURNING vehicle_id, vehicle_key
+"""
+
 EXTRACT_PROMO_CODES = "SELECT promo_code_id, code, discount_type, discount_value, is_active FROM promo_codes"
 
 LOAD_DIM_PROMO_CODE = """
@@ -130,6 +148,7 @@ EXTRACT_TRIPS = """
         t.trip_id,
         t.driver_id,
         t.passenger_id,
+        t.vehicle_id,
         t.pickup_location_id,
         t.dropoff_location_id,
         t.payment_method_id,
@@ -147,8 +166,11 @@ EXTRACT_TRIPS = """
         tc.cancelled_by          -- from trip_cancellations (NULL for non-cancelled)
     FROM trips t
     LEFT JOIN trip_cancellations tc ON t.trip_id = tc.trip_id
+    WHERE %(watermark)s IS NULL OR t.requested_at > %(watermark)s
     ORDER BY t.requested_at
 """
+
+MAX_FACT_WATERMARK = "SELECT MAX(requested_at) FROM fact_trips"
 
 LOAD_FACT_TRIPS = """
     INSERT INTO fact_trips (
@@ -160,6 +182,8 @@ LOAD_FACT_TRIPS = """
         dropoff_location_key,
         payment_method_key,
         promo_code_key,
+        vehicle_key,
+        time_key,
         base_fare,
         tip_amount,
         discount_amount,
